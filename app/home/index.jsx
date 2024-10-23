@@ -71,4 +71,15 @@ const styles = StyleSheet.create({
     searchIcon: {
         padding: 8,
     },
+    searchInput: {
+        flex: 1,
+        borderRadius: theme.radius.sm,
+        paddingVertical: 10,
+        fontSize: hp(1.8),
+    },
+    closeIcon: {
+        backgroundColor: theme.colors.neutral(0.1),
+        padding: 8,
+        borderRadius: theme.radius.sm,
+    },
 });
