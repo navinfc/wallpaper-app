@@ -1,4 +1,5 @@
 const categories = [
+  "backgrounds",
   "fashion",
   "nature",
   "science",
