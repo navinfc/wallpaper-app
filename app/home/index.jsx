@@ -6,7 +6,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather, FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { theme } from "../../constants/theme";
@@ -14,6 +14,9 @@ import { hp, wp } from "../../helpers/common";
 import Categories from "../../components/Categories";
 import { apiCall } from "../../api";
 import ImageGrid from "../../components/ImageGrid";
+import {debounce} from 'lodash';
+
+var page = 1;
 
 const HomeScreen = () => {
   const { top } = useSafeAreaInsets();
@@ -28,6 +31,7 @@ const HomeScreen = () => {
   }, []);
 
   const fetchImages = async (params = {page: 1}, append = false) => {
+    console.log('params:', params, append);
     let res = await apiCall(params);
     if( res.success && res?.data?.hits) {
       if(append)
@@ -36,11 +40,35 @@ const HomeScreen = () => {
         setImages([...res.data.hits]);
     }
 
-  }
+  };
 
   const handleChangeCategory = (cat) => {
     setActiveCategory(cat);
   };
+
+  const handleSearch = (text) => {
+    setSearch(text);
+    if(text.length > 2) {
+      //search for this text
+      page = 1;
+      setImages([]);
+      fetchImages({page, q: text});
+    }
+    if(text == "") {
+      //reset results
+      page = 1;
+      searchInputRef?.current?.clear();
+      setImages([]);
+      fetchImages({page});
+    }
+  };
+
+  const clearSearch = () => {
+    setSearch("");
+    searchInputRef?.current?.clear();
+  };
+
+  const handleTextDebounce = useCallback(debounce(handleSearch, 400), []);
 
 //   console.log("Active Category: ", activeCategory);
 
@@ -71,13 +99,13 @@ const HomeScreen = () => {
           </View>
           <TextInput
             placeholder="Search for photos"
-            value={search}
-            onChangeText={(value) => setSearch(value)}
+            // value={search}
+            onChangeText={handleTextDebounce}
             ref={searchInputRef}
             style={styles.searchInput}
           />
           {search && (
-            <Pressable style={styles.closeIcon}>
+            <Pressable onPress={() => handleSearch("")} style={styles.closeIcon}>
               <Ionicons
                 name="close"
                 size={24}
