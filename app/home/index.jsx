@@ -15,6 +15,7 @@ import Categories from "../../components/Categories";
 import { apiCall } from "../../api";
 import ImageGrid from "../../components/ImageGrid";
 import {debounce} from 'lodash';
+import FiltersModal from "../../components/FiltersModal";
 
 var page = 1;
 
@@ -23,8 +24,10 @@ const HomeScreen = () => {
   const paddingTop = top > 0 ? top + 10 : 30;
   const [search, setSearch] = useState("");
   const [images, setImages] = useState([]);
+  const [filters, setFilters] = useState(null);
   const [activeCategory, setActiveCategory] = useState(null);
   const searchInputRef = useRef(null);
+  const modalRef = useRef(null);
 
   useEffect(() => {
     fetchImages();
@@ -39,7 +42,24 @@ const HomeScreen = () => {
       else
         setImages([...res.data.hits]);
     }
+  };
 
+  const openFiltersModal = () => {
+    modalRef?.current?.present();
+  };
+
+  const closeFiltersModal = () => {
+    modalRef?.current?.close();
+  };
+
+  const applyFilters = () => {
+    console.log('Applying filters');
+    closeFiltersModal();
+  };
+
+  const resetFilters = () => {
+    console.log('Resetting filters');
+    closeFiltersModal();
   };
 
   const handleChangeCategory = (cat) => {
@@ -80,7 +100,7 @@ const HomeScreen = () => {
 
   const handleTextDebounce = useCallback(debounce(handleSearch, 400), []);
 
-//   console.log("Active Category: ", activeCategory);
+  console.log("Filters: ", filters);
 
   return (
     <View style={[styles.container, { paddingTop }]}>
@@ -89,7 +109,7 @@ const HomeScreen = () => {
         <Pressable>
           <Text style={styles.title}>Pixels</Text>
         </Pressable>
-        <Pressable>
+        <Pressable onPress={openFiltersModal}>
           <FontAwesome6
             name="bars-staggered"
             size={22}
@@ -136,6 +156,9 @@ const HomeScreen = () => {
             }
           </View>
       </ScrollView>
+      {/* filters modal */}
+      <FiltersModal modalRef={modalRef} filters={filters} setFilters={setFilters}
+      onClose={closeFiltersModal} onApply={applyFilters} onReset={resetFilters}/>
     </View>
   );
 };
