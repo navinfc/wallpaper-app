@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -53,12 +54,32 @@ const HomeScreen = () => {
   };
 
   const applyFilters = () => {
-    console.log('Applying filters');
+    if(filters) {
+      page = 1;
+      setImages([]);
+      let params = {
+        page,
+        ...filters,
+      }
+      if(activeCategory) params.category = activeCategory;
+      if(search) params.q = search;
+      fetchImages(params, false);
+    }
     closeFiltersModal();
   };
 
   const resetFilters = () => {
-    console.log('Resetting filters');
+    if(filters) {
+      page = 1;
+      setFilters(null);
+      setImages([]);
+      let params = {
+        page,
+      }
+      if(activeCategory) params.category = activeCategory;
+      if(search) params.q = search;
+      fetchImages(params, false);
+    }
     closeFiltersModal();
   };
 
@@ -69,6 +90,7 @@ const HomeScreen = () => {
     page = 1;
     let params = {
       page,
+      ...filters
     }
     if(cat) params.category = cat;
     fetchImages(params, false);
@@ -81,7 +103,7 @@ const HomeScreen = () => {
       page = 1;
       setImages([]);
       setActiveCategory(null); //clear category when searching
-      fetchImages({page, q: text}, false);
+      fetchImages({page, q: text, ...filters}, false);
     }
     if(text == "") {
       //reset results
@@ -89,7 +111,7 @@ const HomeScreen = () => {
       searchInputRef?.current?.clear();
       setImages([]);
       setActiveCategory(null); //clear category when searching
-      fetchImages({page}, false);
+      fetchImages({page, ...filters}, false);
     }
   };
 
@@ -149,11 +171,18 @@ const HomeScreen = () => {
         <View style={styles.categories}>
             <Categories activeCategory={activeCategory} handleChangeCategory={handleChangeCategory} />
         </View>
+
+        {/* filters */}
+
         {/* images masonry grid*/}
           <View>
             {
               images.length > 0 && <ImageGrid images={images}/>
             }
+          </View>
+          {/* loading animation */}
+          <View style={{marginBottom: 70, marginTop: images.length > 0 ? 10 : 70}}>
+            <ActivityIndicator size="large" />
           </View>
       </ScrollView>
       {/* filters modal */}

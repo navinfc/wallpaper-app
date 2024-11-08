@@ -49,11 +49,10 @@ export const ColorFilter = ({data, filterName, filters, setFilters}) => {
         {
           data && data.map((item, index) => {
             let isActive = filters && filters[filterName] == item;
-            let backgroundColor = isActive ? theme.colors.neutral(0.7) : 'white';
-            let color = isActive ? 'white' : theme.colors.neutral(0.7);
+            let borderColor = isActive ? theme.colors.neutral(0.4) : "white";
             return (
               <Pressable onPress={() => onSelect(item)} key={item}>
-                <View style={[styles.colorWrapper]}>
+                <View style={[styles.colorWrapper, {borderColor}]}>
                   <View style={[styles.color, {backgroundColor: item}]}></View>
                 </View>
               </Pressable>
